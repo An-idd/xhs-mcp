@@ -24,14 +24,21 @@ func (u *UserProfileAction) UserProfile(ctx context.Context, userID, xsecToken s
 
 	searchURL := makeUserProfileURL(userID, xsecToken)
 	page.MustNavigate(searchURL)
-	page.MustWaitStable()
 
 	return u.extractUserProfileData(page)
 }
 
+// userPageReadyJS 判断用户主页数据是否已注入 __INITIAL_STATE__（替代会卡死的 MustWaitStable）。
+const userPageReadyJS = `() => {
+	const s = window.__INITIAL_STATE__;
+	if (!s || !s.user || !s.user.userPageData) return false;
+	const d = s.user.userPageData;
+	return (d.value !== undefined ? d.value : d._value) != null;
+}`
+
 // extractUserProfileData 从页面中提取用户资料数据的通用方法
 func (u *UserProfileAction) extractUserProfileData(page *rod.Page) (*UserProfileResponse, error) {
-	page.MustWait(`() => window.__INITIAL_STATE__ !== undefined`)
+	page.MustWait(userPageReadyJS)
 
 	userDataResult := page.MustEval(`() => {
 		if (window.__INITIAL_STATE__ &&
@@ -114,9 +121,6 @@ func (u *UserProfileAction) GetMyProfileViaSidebar(ctx context.Context) (*UserPr
 	if err := navigate.ToProfilePage(ctx); err != nil {
 		return nil, fmt.Errorf("failed to navigate to profile page via sidebar: %w", err)
 	}
-
-	// 等待页面加载完成并获取 __INITIAL_STATE__
-	page.MustWaitStable()
 
 	return u.extractUserProfileData(page)
 }

@@ -165,14 +165,27 @@ func NewSearchAction(page *rod.Page) *SearchAction {
 	return &SearchAction{page: pp}
 }
 
+// searchFeedsReadyJS 判断搜索结果是否已注入 __INITIAL_STATE__。
+// 用它替代 MustWaitStable：后者含 WaitRequestIdle，在小红书这类持续后台请求的 SPA 上
+// 永远等不到网络空闲而卡死；这里直接等待目标数据出现，秒级返回。
+const searchFeedsReadyJS = `() => {
+	const s = window.__INITIAL_STATE__;
+	if (!s || !s.search || !s.search.feeds) return false;
+	const f = s.search.feeds;
+	const v = f.value !== undefined ? f.value : f._value;
+	return Array.isArray(v) && v.length > 0;
+}`
+
 func (s *SearchAction) Search(ctx context.Context, keyword string, filters ...FilterOption) ([]Feed, error) {
 	page := s.page.Context(ctx)
 
 	searchURL := makeSearchURL(keyword)
 	page.MustNavigate(searchURL)
-	page.MustWaitStable()
 
-	page.MustWait(`() => window.__INITIAL_STATE__ !== undefined`)
+	// 直接等待搜索结果注入 __INITIAL_STATE__。
+	// 不用 MustWaitStable/MustWaitDOMStable：小红书页面持续刷新(视频/动画/懒加载)，
+	// 网络与 DOM 都不会"稳定"，这两个等待会一直卡到超时。
+	page.MustWait(searchFeedsReadyJS)
 
 	// 如果有筛选条件，则应用筛选
 	if len(filters) > 0 {
@@ -208,10 +221,9 @@ func (s *SearchAction) Search(ctx context.Context, keyword string, filters ...Fi
 			option.MustClick()
 		}
 
-		// 等待页面更新
-		page.MustWaitStable()
-		// 重新等待 __INITIAL_STATE__ 更新
-		page.MustWait(`() => window.__INITIAL_STATE__ !== undefined`)
+		// 筛选会触发结果刷新，给一点时间让新数据注入后再确认就绪
+		time.Sleep(1500 * time.Millisecond)
+		page.MustWait(searchFeedsReadyJS)
 	}
 
 	result := page.MustEval(`() => {

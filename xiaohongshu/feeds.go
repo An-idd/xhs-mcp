@@ -18,7 +18,6 @@ func NewFeedsListAction(page *rod.Page) *FeedsListAction {
 	pp := page.Timeout(60 * time.Second)
 
 	pp.MustNavigate("https://www.xiaohongshu.com")
-	pp.MustWaitDOMStable()
 
 	return &FeedsListAction{page: pp}
 }
@@ -27,7 +26,14 @@ func NewFeedsListAction(page *rod.Page) *FeedsListAction {
 func (f *FeedsListAction) GetFeedsList(ctx context.Context) ([]Feed, error) {
 	page := f.page.Context(ctx)
 
-	time.Sleep(1 * time.Second)
+	// 直接等待首页推荐流注入 __INITIAL_STATE__（不用会卡死的 MustWaitStable/DOMStable）
+	page.MustWait(`() => {
+		const s = window.__INITIAL_STATE__;
+		if (!s || !s.feed || !s.feed.feeds) return false;
+		const f = s.feed.feeds;
+		const v = f.value !== undefined ? f.value : f._value;
+		return Array.isArray(v) && v.length > 0;
+	}`)
 
 	result := page.MustEval(`() => {
 		if (window.__INITIAL_STATE__ &&

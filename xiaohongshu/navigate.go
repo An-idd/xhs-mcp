@@ -32,9 +32,7 @@ func (n *NavigateAction) ToProfilePage(ctx context.Context) error {
 		return err
 	}
 
-	page.MustWaitStable()
-
-	// Find and click the "我" channel link in sidebar
+	// Find and click the "我" channel link in sidebar（MustElement 自带等待）
 	profileLink := page.MustElement(`div.main-container li.user.side-bar-component a.link-wrapper span.channel`)
 	profileLink.MustClick()
 
