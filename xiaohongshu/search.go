@@ -213,12 +213,17 @@ func (s *SearchAction) Search(ctx context.Context, keyword string, filters ...Fi
 		// 等待筛选面板出现
 		page.MustWait(`() => document.querySelector('div.filter-panel') !== null`)
 
-		// 应用所有筛选条件
+		// 应用所有筛选条件：用稳定的 data-hp-kind 属性定位标签，
+		// 避免脆弱的 nth-child(页面新增了 div.tag-container 包层会令其失效)。
 		for _, filter := range allInternalFilters {
-			selector := fmt.Sprintf(`div.filter-panel div.filters:nth-child(%d) div.tags:nth-child(%d)`,
-				filter.FiltersIndex, filter.TagsIndex)
-			option := page.MustElement(selector)
-			option.MustClick()
+			// 默认值即"不筛选"，无需点击(综合=默认排序，不限=默认)
+			if filter.Text == "综合" || filter.Text == "不限" {
+				continue
+			}
+			selector := fmt.Sprintf(`div.filter-panel div.tags[data-hp-kind="filter-tag-%s"]`, filter.Text)
+			// 用 JS click 而非 MustClick：筛选标签渲染为近乎透明(opacity~0)，
+			// rod 的可见性检查会一直等不到"可点击"而卡死；JS 点击直接触发 Vue 事件。
+			page.MustElement(selector).MustEval(`() => this.click()`)
 		}
 
 		// 筛选会触发结果刷新，给一点时间让新数据注入后再确认就绪
