@@ -14,11 +14,18 @@ import (
 )
 
 // XiaohongshuService 小红书业务服务
-type XiaohongshuService struct{}
+type XiaohongshuService struct {
+	mgr *browserManager
+}
 
 // NewXiaohongshuService 创建小红书服务实例
 func NewXiaohongshuService() *XiaohongshuService {
-	return &XiaohongshuService{}
+	return &XiaohongshuService{mgr: newBrowserManager()}
+}
+
+// Close 释放共享浏览器，服务关闭时调用。
+func (s *XiaohongshuService) Close() {
+	s.mgr.reset()
 }
 
 // LoginStatusResponse 登录状态响应
@@ -51,7 +58,10 @@ type UserProfileResponse struct {
 func (s *XiaohongshuService) DeleteCookies(ctx context.Context) error {
 	cookiePath := cookies.GetCookiesFilePath()
 	cookieLoader := cookies.NewLoadCookie(cookiePath)
-	return cookieLoader.DeleteCookies()
+	err := cookieLoader.DeleteCookies()
+	// 丢弃共享浏览器，下次查询会重建并反映 cookie 变化
+	s.mgr.reset()
+	return err
 }
 
 // CheckLoginStatus 检查登录状态
@@ -108,6 +118,9 @@ func (s *XiaohongshuService) GetLoginQrcode(ctx context.Context) (*LoginQrcodeRe
 			if loginAction.WaitForLogin(ctxTimeout) {
 				if er := saveCookies(page); er != nil {
 					logrus.Errorf("failed to save cookies: %v", er)
+				} else {
+					// 新登录态已保存，丢弃旧的共享查询浏览器使其重建
+					s.mgr.reset()
 				}
 			}
 		}()
@@ -127,50 +140,44 @@ func (s *XiaohongshuService) GetLoginQrcode(ctx context.Context) (*LoginQrcodeRe
 
 // ListFeeds 获取Feeds列表
 func (s *XiaohongshuService) ListFeeds(ctx context.Context) (*FeedsListResponse, error) {
-	b := newBrowser()
-	defer b.Close()
-
-	page := b.NewPage()
-	defer page.Close()
-
-	// 创建 Feeds 列表 action
-	action := xiaohongshu.NewFeedsListAction(page)
-
-	// 获取 Feeds 列表
-	feeds, err := action.GetFeedsList(ctx)
+	var feeds []xiaohongshu.Feed
+	err := s.mgr.withPage(ctx, func(page *rod.Page) error {
+		if err := s.mgr.ensureLoggedIn(ctx, page); err != nil {
+			return err
+		}
+		f, err := xiaohongshu.NewFeedsListAction(page).GetFeedsList(ctx)
+		if err != nil {
+			return err
+		}
+		feeds = f
+		return nil
+	})
 	if err != nil {
 		logrus.Errorf("获取 Feeds 列表失败: %v", err)
 		return nil, err
 	}
 
-	response := &FeedsListResponse{
-		Feeds: feeds,
-		Count: len(feeds),
-	}
-
-	return response, nil
+	return &FeedsListResponse{Feeds: feeds, Count: len(feeds)}, nil
 }
 
 func (s *XiaohongshuService) SearchFeeds(ctx context.Context, keyword string, filters ...xiaohongshu.FilterOption) (*FeedsListResponse, error) {
-	b := newBrowser()
-	defer b.Close()
-
-	page := b.NewPage()
-	defer page.Close()
-
-	action := xiaohongshu.NewSearchAction(page)
-
-	feeds, err := action.Search(ctx, keyword, filters...)
+	var feeds []xiaohongshu.Feed
+	err := s.mgr.withPage(ctx, func(page *rod.Page) error {
+		if err := s.mgr.ensureLoggedIn(ctx, page); err != nil {
+			return err
+		}
+		f, err := xiaohongshu.NewSearchAction(page).Search(ctx, keyword, filters...)
+		if err != nil {
+			return err
+		}
+		feeds = f
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	response := &FeedsListResponse{
-		Feeds: feeds,
-		Count: len(feeds),
-	}
-
-	return response, nil
+	return &FeedsListResponse{Feeds: feeds, Count: len(feeds)}, nil
 }
 
 // GetFeedDetail 获取Feed详情
@@ -180,51 +187,48 @@ func (s *XiaohongshuService) GetFeedDetail(ctx context.Context, feedID, xsecToke
 
 // GetFeedDetailWithConfig 使用配置获取Feed详情
 func (s *XiaohongshuService) GetFeedDetailWithConfig(ctx context.Context, feedID, xsecToken string, loadAllComments bool, config xiaohongshu.CommentLoadConfig) (*FeedDetailResponse, error) {
-	b := newBrowser()
-	defer b.Close()
-
-	page := b.NewPage()
-	defer page.Close()
-
-	// 创建 Feed 详情 action
-	action := xiaohongshu.NewFeedDetailAction(page)
-
-	// 获取 Feed 详情
-	result, err := action.GetFeedDetailWithConfig(ctx, feedID, xsecToken, loadAllComments, config)
+	var result any
+	err := s.mgr.withPage(ctx, func(page *rod.Page) error {
+		if err := s.mgr.ensureLoggedIn(ctx, page); err != nil {
+			return err
+		}
+		r, err := xiaohongshu.NewFeedDetailAction(page).GetFeedDetailWithConfig(ctx, feedID, xsecToken, loadAllComments, config)
+		if err != nil {
+			return err
+		}
+		result = r
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	response := &FeedDetailResponse{
-		FeedID: feedID,
-		Data:   result,
-	}
-
-	return response, nil
+	return &FeedDetailResponse{FeedID: feedID, Data: result}, nil
 }
 
 // UserProfile 获取用户信息
 func (s *XiaohongshuService) UserProfile(ctx context.Context, userID, xsecToken string) (*UserProfileResponse, error) {
-	b := newBrowser()
-	defer b.Close()
-
-	page := b.NewPage()
-	defer page.Close()
-
-	action := xiaohongshu.NewUserProfileAction(page)
-
-	result, err := action.UserProfile(ctx, userID, xsecToken)
+	var result *xiaohongshu.UserProfileResponse
+	err := s.mgr.withPage(ctx, func(page *rod.Page) error {
+		if err := s.mgr.ensureLoggedIn(ctx, page); err != nil {
+			return err
+		}
+		r, err := xiaohongshu.NewUserProfileAction(page).UserProfile(ctx, userID, xsecToken)
+		if err != nil {
+			return err
+		}
+		result = r
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	response := &UserProfileResponse{
+
+	return &UserProfileResponse{
 		UserBasicInfo: result.UserBasicInfo,
 		Interactions:  result.Interactions,
 		Feeds:         result.Feeds,
-	}
-
-	return response, nil
-
+	}, nil
 }
 
 func newBrowser() *browser.Browser {

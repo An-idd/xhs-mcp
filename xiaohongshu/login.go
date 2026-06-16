@@ -16,6 +16,25 @@ func NewLogin(page *rod.Page) *LoginAction {
 	return &LoginAction{page: page}
 }
 
+// QuickCheckLogin 用短超时探测登录态：导航到 explore 并检查已登录用户元素。
+// 与 CheckLoginStatus 逻辑一致，但带 15s 超时、用 rod.Try 把 panic 转为 error，
+// 供查询前的快速失败判断使用，避免未登录时长时间卡死。
+func QuickCheckLogin(ctx context.Context, page *rod.Page) (bool, error) {
+	pp := page.Context(ctx).Timeout(15 * time.Second)
+
+	if err := rod.Try(func() {
+		pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
+	}); err != nil {
+		return false, errors.Wrap(err, "navigate explore failed")
+	}
+
+	exists, _, err := pp.Has(`.main-container .user .link-wrapper .channel`)
+	if err != nil {
+		return false, errors.Wrap(err, "check login element failed")
+	}
+	return exists, nil
+}
+
 func (a *LoginAction) CheckLoginStatus(ctx context.Context) (bool, error) {
 	pp := a.page.Context(ctx)
 	pp.MustNavigate("https://www.xiaohongshu.com/explore").MustWaitLoad()
