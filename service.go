@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/sirupsen/logrus"
-	"github.com/xpzouying/headless_browser"
 	"github.com/xpzouying/xiaohongshu-mcp/browser"
 	"github.com/xpzouying/xiaohongshu-mcp/configs"
 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
@@ -228,8 +227,8 @@ func (s *XiaohongshuService) UserProfile(ctx context.Context, userID, xsecToken 
 
 }
 
-func newBrowser() *headless_browser.Browser {
-	return browser.NewBrowser(configs.IsHeadless(), browser.WithBinPath(configs.GetBinPath()))
+func newBrowser() *browser.Browser {
+	return browser.NewBrowser(configs.IsHeadless(), configs.IsHeadlessNew(), browser.WithBinPath(configs.GetBinPath()))
 }
 
 func saveCookies(page *rod.Page) error {

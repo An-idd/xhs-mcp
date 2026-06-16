@@ -20,7 +20,7 @@ func main() {
 	flag.Parse()
 
 	// 登录的时候，需要界面，所以不能无头模式
-	b := browser.NewBrowser(false, browser.WithBinPath(binPath))
+	b := browser.NewBrowser(false, false, browser.WithBinPath(binPath))
 	defer b.Close()
 
 	page := b.NewPage()
