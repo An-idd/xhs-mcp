@@ -15,29 +15,6 @@ func boolPtr(b bool) *bool { return &b }
 
 // MCP 工具参数结构体定义
 
-// PublishContentArgs 发布内容的参数
-type PublishContentArgs struct {
-	Title      string   `json:"title" jsonschema:"内容标题（小红书限制：最多20个中文字或英文单词）"`
-	Content    string   `json:"content" jsonschema:"正文内容，不包含以#开头的标签内容，所有话题标签都用tags参数来生成和提供即可"`
-	Images     []string `json:"images" jsonschema:"图片路径列表（至少需要1张图片）。支持两种方式：1. HTTP/HTTPS图片链接（自动下载）；2. 本地图片绝对路径（推荐，如:/Users/user/image.jpg）"`
-	Tags       []string `json:"tags,omitempty" jsonschema:"话题标签列表（可选参数），如 [美食, 旅行, 生活]"`
-	ScheduleAt string   `json:"schedule_at,omitempty" jsonschema:"定时发布时间（可选），ISO8601格式如 2024-01-20T10:30:00+08:00，支持1小时至14天内。不填则立即发布"`
-	IsOriginal bool     `json:"is_original,omitempty" jsonschema:"是否声明原创（可选），true为声明原创，false或不填则不声明"`
-	Visibility string   `json:"visibility,omitempty" jsonschema:"可见范围（可选），支持: 公开可见(默认)、仅自己可见、仅互关好友可见。不填则默认公开可见"`
-	Products   []string `json:"products,omitempty" jsonschema:"商品关键词列表（可选），用于绑定带货商品。填写商品名称或商品ID，系统会自动搜索并选择第一个匹配结果。需账号已开通商品功能。示例: [面膜, 防晒霜SPF50]"`
-}
-
-// PublishVideoArgs 发布视频的参数（仅支持本地单个视频文件）
-type PublishVideoArgs struct {
-	Title      string   `json:"title" jsonschema:"内容标题（小红书限制：最多20个中文字或英文单词）"`
-	Content    string   `json:"content" jsonschema:"正文内容，不包含以#开头的标签内容，所有话题标签都用tags参数来生成和提供即可"`
-	Video      string   `json:"video" jsonschema:"本地视频绝对路径（仅支持单个视频文件，如:/Users/user/video.mp4）"`
-	Tags       []string `json:"tags,omitempty" jsonschema:"话题标签列表（可选参数），如 [美食, 旅行, 生活]"`
-	ScheduleAt string   `json:"schedule_at,omitempty" jsonschema:"定时发布时间（可选），ISO8601格式如 2024-01-20T10:30:00+08:00，支持1小时至14天内。不填则立即发布"`
-	Visibility string   `json:"visibility,omitempty" jsonschema:"可见范围（可选），支持: 公开可见(默认)、仅自己可见、仅互关好友可见。不填则默认公开可见"`
-	Products   []string `json:"products,omitempty" jsonschema:"商品关键词列表（可选），用于绑定带货商品。填写商品名称或商品ID，系统会自动搜索并选择第一个匹配结果。需账号已开通商品功能。示例: [面膜, 防晒霜SPF50]"`
-}
-
 // SearchFeedsArgs 搜索内容的参数
 type SearchFeedsArgs struct {
 	Keyword string       `json:"keyword" jsonschema:"搜索关键词"`
@@ -68,36 +45,6 @@ type FeedDetailArgs struct {
 type UserProfileArgs struct {
 	UserID    string `json:"user_id" jsonschema:"小红书用户ID，从Feed列表获取"`
 	XsecToken string `json:"xsec_token" jsonschema:"访问令牌，从Feed列表的xsecToken字段获取"`
-}
-
-// PostCommentArgs 发表评论的参数
-type PostCommentArgs struct {
-	FeedID    string `json:"feed_id" jsonschema:"小红书笔记ID，从Feed列表获取"`
-	XsecToken string `json:"xsec_token" jsonschema:"访问令牌，从Feed列表的xsecToken字段获取"`
-	Content   string `json:"content" jsonschema:"评论内容"`
-}
-
-// ReplyCommentArgs 回复评论的参数
-type ReplyCommentArgs struct {
-	FeedID    string `json:"feed_id" jsonschema:"小红书笔记ID，从Feed列表获取"`
-	XsecToken string `json:"xsec_token" jsonschema:"访问令牌，从Feed列表的xsecToken字段获取"`
-	CommentID string `json:"comment_id,omitempty" jsonschema:"目标评论ID，从评论列表获取"`
-	UserID    string `json:"user_id,omitempty" jsonschema:"目标评论用户ID，从评论列表获取"`
-	Content   string `json:"content" jsonschema:"回复内容"`
-}
-
-// LikeFeedArgs 点赞参数
-type LikeFeedArgs struct {
-	FeedID    string `json:"feed_id" jsonschema:"小红书笔记ID，从Feed列表获取"`
-	XsecToken string `json:"xsec_token" jsonschema:"访问令牌，从Feed列表的xsecToken字段获取"`
-	Unlike    bool   `json:"unlike,omitempty" jsonschema:"是否取消点赞，true为取消点赞，false或未设置则为点赞"`
-}
-
-// FavoriteFeedArgs 收藏参数
-type FavoriteFeedArgs struct {
-	FeedID     string `json:"feed_id" jsonschema:"小红书笔记ID，从Feed列表获取"`
-	XsecToken  string `json:"xsec_token" jsonschema:"访问令牌，从Feed列表的xsecToken字段获取"`
-	Unfavorite bool   `json:"unfavorite,omitempty" jsonschema:"是否取消收藏，true为取消收藏，false或未设置则为收藏"`
 }
 
 // InitMCPServer 初始化 MCP Server
@@ -201,34 +148,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 4: 发布内容
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "publish_content",
-			Description: "发布小红书图文内容",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Publish Content",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("publish_content", func(ctx context.Context, req *mcp.CallToolRequest, args PublishContentArgs) (*mcp.CallToolResult, any, error) {
-			// 转换参数格式到现有的 handler
-			argsMap := map[string]interface{}{
-				"title":       args.Title,
-				"content":     args.Content,
-				"images":      convertStringsToInterfaces(args.Images),
-				"tags":        convertStringsToInterfaces(args.Tags),
-				"schedule_at": args.ScheduleAt,
-				"is_original": args.IsOriginal,
-				"visibility":  args.Visibility,
-				"products":    convertStringsToInterfaces(args.Products),
-			}
-			result := appServer.handlePublishContent(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 5: 获取Feed列表
+	// 工具 4: 获取Feed列表
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "list_feeds",
@@ -305,7 +225,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 8: 获取用户主页
+	// 工具 7: 获取用户主页
 	mcp.AddTool(server,
 		&mcp.Tool{
 			Name:        "user_profile",
@@ -325,125 +245,7 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		}),
 	)
 
-	// 工具 9: 发表评论
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "post_comment_to_feed",
-			Description: "发表评论到小红书笔记",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Post Comment",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("post_comment_to_feed", func(ctx context.Context, req *mcp.CallToolRequest, args PostCommentArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"content":    args.Content,
-			}
-			result := appServer.handlePostComment(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 10: 回复评论
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "reply_comment_in_feed",
-			Description: "回复小红书笔记下的指定评论",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Reply Comment",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		func(ctx context.Context, req *mcp.CallToolRequest, args ReplyCommentArgs) (*mcp.CallToolResult, any, error) {
-			if args.CommentID == "" && args.UserID == "" {
-				return &mcp.CallToolResult{
-					IsError: true,
-					Content: []mcp.Content{&mcp.TextContent{Text: "缺少 comment_id 或 user_id"}},
-				}, nil, nil
-			}
-
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"comment_id": args.CommentID,
-				"user_id":    args.UserID,
-				"content":    args.Content,
-			}
-			result := appServer.handleReplyComment(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		},
-	)
-
-	// 工具 11: 发布视频（仅本地文件）
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "publish_with_video",
-			Description: "发布小红书视频内容（仅支持本地单个视频文件）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Publish Video",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("publish_with_video", func(ctx context.Context, req *mcp.CallToolRequest, args PublishVideoArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"title":       args.Title,
-				"content":     args.Content,
-				"video":       args.Video,
-				"tags":        convertStringsToInterfaces(args.Tags),
-				"schedule_at": args.ScheduleAt,
-				"visibility":  args.Visibility,
-				"products":    convertStringsToInterfaces(args.Products),
-			}
-			result := appServer.handlePublishVideo(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 12: 点赞笔记
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "like_feed",
-			Description: "为指定笔记点赞或取消点赞（如已点赞将跳过点赞，如未点赞将跳过取消点赞）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Like Feed",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("like_feed", func(ctx context.Context, req *mcp.CallToolRequest, args LikeFeedArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"unlike":     args.Unlike,
-			}
-			result := appServer.handleLikeFeed(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	// 工具 13: 收藏笔记
-	mcp.AddTool(server,
-		&mcp.Tool{
-			Name:        "favorite_feed",
-			Description: "收藏指定笔记或取消收藏（如已收藏将跳过收藏，如未收藏将跳过取消收藏）",
-			Annotations: &mcp.ToolAnnotations{
-				Title:           "Favorite Feed",
-				DestructiveHint: boolPtr(true),
-			},
-		},
-		withPanicRecovery("favorite_feed", func(ctx context.Context, req *mcp.CallToolRequest, args FavoriteFeedArgs) (*mcp.CallToolResult, any, error) {
-			argsMap := map[string]interface{}{
-				"feed_id":    args.FeedID,
-				"xsec_token": args.XsecToken,
-				"unfavorite": args.Unfavorite,
-			}
-			result := appServer.handleFavoriteFeed(ctx, argsMap)
-			return convertToMCPResult(result), nil, nil
-		}),
-	)
-
-	logrus.Infof("Registered %d MCP tools", 13)
+	logrus.Infof("Registered %d MCP tools", 7)
 }
 
 // convertToMCPResult 将自定义的 MCPToolResult 转换为官方 SDK 的格式
@@ -475,13 +277,4 @@ func convertToMCPResult(result *MCPToolResult) *mcp.CallToolResult {
 		Content: contents,
 		IsError: result.IsError,
 	}
-}
-
-// convertStringsToInterfaces 辅助函数：将 []string 转换为 []interface{}
-func convertStringsToInterfaces(strs []string) []interface{} {
-	result := make([]interface{}, len(strs))
-	for i, s := range strs {
-		result[i] = s
-	}
-	return result
 }

@@ -8,7 +8,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/sirupsen/logrus"
 )
@@ -17,7 +16,7 @@ import (
 type AppServer struct {
 	xiaohongshuService *XiaohongshuService
 	mcpServer          *mcp.Server
-	router             *gin.Engine
+	router             http.Handler
 	httpServer         *http.Server
 }
 
