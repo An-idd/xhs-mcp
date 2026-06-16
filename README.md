@@ -1,9 +1,5 @@
 # xiaohongshu-mcp
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-27-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接查询小红书数据。
 
 > **本分支为「纯查询」精简版**：仅保留只读的数据查询能力（搜索、推荐列表、笔记详情+评论、用户主页），已移除发布、评论、点赞、收藏等写操作及 REST HTTP API，仅通过 MCP 协议对外提供服务。
@@ -36,20 +32,10 @@ MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接查询小红书�
 
 **主要功能**
 
-> 💡 **提示：** 点击下方功能标题可展开查看视频演示
-
 <details>
 <summary><b>1. 登录和检查登录状态</b></summary>
 
 第一步必须，小红书需要进行登录。可以检查当前登录状态。
-
-**登录演示：**
-
-https://github.com/user-attachments/assets/8b05eb42-d437-41b7-9235-e2143f19e8b7
-
-**检查登录状态演示：**
-
-https://github.com/user-attachments/assets/bd9a9a4a-58cb-4421-b8f3-015f703ce1f9
 
 </details>
 
@@ -58,20 +44,12 @@ https://github.com/user-attachments/assets/bd9a9a4a-58cb-4421-b8f3-015f703ce1f9
 
 根据关键词搜索小红书内容。
 
-**搜索帖子演示：**
-
-https://github.com/user-attachments/assets/03c5077d-6160-4b18-b629-2e40933a1fd3
-
 </details>
 
 <details>
 <summary><b>3. 获取推荐列表</b></summary>
 
 获取小红书首页推荐内容列表。
-
-**获取推荐列表演示：**
-
-https://github.com/user-attachments/assets/110fc15d-46f2-4cca-bdad-9de5b5b8cc28
 
 </details>
 
@@ -90,10 +68,6 @@ https://github.com/user-attachments/assets/110fc15d-46f2-4cca-bdad-9de5b5b8cc28
 - 需要提供帖子 ID 和 xsec_token（两个参数缺一不可）
 - 这两个参数可以从 Feed 列表或搜索结果中获取
 - 必须先登录才能使用此功能
-
-**获取帖子详情演示：**
-
-https://github.com/user-attachments/assets/76a26130-a216-4371-a6b3-937b8fda092a
 
 </details>
 
@@ -131,7 +105,6 @@ https://github.com/user-attachments/assets/76a26130-a216-4371-a6b3-937b8fda092a
 
 1. 该项目是在自己的另外一个项目的基础上开源出来的，原来的项目稳定运行一年多，没有出现过封号的情况，只有出现过 Cookies 过期需要重新登录。
 2. 如果账号没有实名认证，特别是新号，一般会触发 **实名认证** 的消息提醒（参见下图）。⚠️ 这个不是封号，不用 MCP 也会要求实名认证。实名认证后，账号就正常了。建议使用该项目前就先实名。
-   <img width="508" height="306" alt="image" src="https://github.com/user-attachments/assets/34383e1b-f666-409f-9870-002655507dc1" />
 
 该项目是基于学习的目的，禁止一切违法行为。
 
@@ -258,27 +231,11 @@ XHS_PROXY=http://proxy:port go run .
 npx @modelcontextprotocol/inspector
 ```
 
-![运行 Inspector](./assets/run_inspect.png)
-
 运行后，打开红色标记的链接，配置 MCP inspector，输入 `http://localhost:18060/mcp` ，点击 `Connect` 按钮。
-
-<img width="915" height="659" alt="bf9532dd0b7ba423491accf511a467de" src="https://github.com/user-attachments/assets/08bc3cef-73e7-42d2-b923-7ba9e6c8af30" />
 
 **注意：** 左侧边框中的选项是否正确。
 
 按照上面配置 MCP inspector 后，点击 `List Tools` 按钮，查看所有的 Tools。
-
-## 1.5. 使用 MCP 查询
-
-### 检查登录状态
-
-![检查登录状态](./assets/check_login.gif)
-
-### 搜索内容
-
-使用搜索功能，根据关键词搜索小红书内容：
-
-![搜索内容](./assets/search_result.png)
 
 ## 2. MCP 客户端接入
 
@@ -410,16 +367,6 @@ opencode mcp list
 3. 在 Cursor 聊天中，工具应该自动可用
 4. 可以通过聊天界面的 "Available Tools" 查看已连接的 MCP 工具
 
-**Demo**
-
-插件 MCP 接入：
-
-![cursor_mcp_settings](./assets/cursor_mcp_settings.png)
-
-调用 MCP 工具：（以检查登录状态为例）
-
-![cursor_mcp_check_login](./assets/cursor_mcp_check_login.png)
-
 </details>
 
 <details>
@@ -450,18 +397,8 @@ opencode mcp list
 }
 ```
 
-**查看配置**：
-
-![vscode_config](./assets/vscode_mcp_config.png)
-
 1. 确认运行状态。
 2. 查看 `tools` 是否正确检测。
-
-**Demo**
-
-以搜索帖子内容为例：
-
-![vscode_mcp_search](./assets/vscode_search_demo.png)
 
 </details>
 
@@ -682,91 +619,3 @@ npx mcporter list xiaohongshu-mcp
 - 在 **Docker 环境** 下，请使用
   👉 [http://host.docker.internal:18060/mcp](http://host.docker.internal:18060/mcp)
 - 在 **非 Docker 环境** 下，请使用 **本机 IPv4 地址** 访问。
-
----
-
-## 3. 小红书 MCP 互助群
-
-**重要：在群里问问题之前，请一定要先仔细看完 README 文档以及查看 Issues。**
-
-### 微信群
-|                                                 微信群 23 群                                        |                                                 微信群 24 群                                         |
-| :------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/user-attachments/assets/0098af97-b59d-4154-9c99-6cbd453db011" alt="WechatIMG119" width="300"> | <img src="https://github.com/user-attachments/assets/b119136a-a815-4a1f-8f2d-1adfb9069150" alt="WechatIMG119" width="300">|
-
-### 飞书群
-
-|                                                         飞书 2 群                                                         |                                                         飞书 3 群                                                         |                                                         飞书 4 群                                                         |                                                         飞书 5 群                                                         |
-| :-----------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/user-attachments/assets/4983ea42-ce5b-4e26-a8c0-33889093b579" alt="qr-feishu02" width="260"> | <img src="https://github.com/user-attachments/assets/c77b45da-6028-4d3a-b421-ccc6c7210695" alt="qr-feishu03" width="260"> | <img src="https://github.com/user-attachments/assets/c42f5595-71cd-4d9b-b7f8-0c333bd25e2b" alt="qr-feishu04" width="260"> | <img src="https://github.com/user-attachments/assets/c032801c-bf02-4e8e-81ad-fb8471b3d765" alt="qr-feishu05" width="260"> |
-
-> **注意：**
->
-> 1. 微信群的二维码有时间限制，有时候忘记更新，麻烦等待更新或者提交 Issue 催我更新。
-> 2. 飞书群，如果有的群满了，可以尝试扫一下另外一个群，总有坑位。
-
-## 🙏 致谢贡献者 ✨
-
-感谢以下所有为本项目做出贡献的朋友！（排名不分先后）
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://haha.ai"><img src="https://avatars.githubusercontent.com/u/3946563?v=4?s=100" width="100px;" alt="zy"/><br /><sub><b>zy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Code">💻</a> <a href="#ideas-xpzouying" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=xpzouying" title="Documentation">📖</a> <a href="#design-xpzouying" title="Design">🎨</a> <a href="#maintenance-xpzouying" title="Maintenance">🚧</a> <a href="#infra-xpzouying" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/pulls?q=is%3Apr+reviewed-by%3Axpzouying" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://www.hwbuluo.com"><img src="https://avatars.githubusercontent.com/u/1271815?v=4?s=100" width="100px;" alt="clearwater"/><br /><sub><b>clearwater</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=esperyong" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/laryzhong"><img src="https://avatars.githubusercontent.com/u/47939471?v=4?s=100" width="100px;" alt="Zhongpeng"/><br /><sub><b>Zhongpeng</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=laryzhong" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DTDucas"><img src="https://avatars.githubusercontent.com/u/105262836?v=4?s=100" width="100px;" alt="Duong Tran"/><br /><sub><b>Duong Tran</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=DTDucas" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Angiin"><img src="https://avatars.githubusercontent.com/u/17389304?v=4?s=100" width="100px;" alt="Angiin"/><br /><sub><b>Angiin</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Angiin" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/muhenan"><img src="https://avatars.githubusercontent.com/u/43441941?v=4?s=100" width="100px;" alt="Henan Mu"/><br /><sub><b>Henan Mu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=muhenan" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/chengazhen"><img src="https://avatars.githubusercontent.com/u/52627267?v=4?s=100" width="100px;" alt="Journey"/><br /><sub><b>Journey</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=chengazhen" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/eveyuyi"><img src="https://avatars.githubusercontent.com/u/69026872?v=4?s=100" width="100px;" alt="Eve Yu"/><br /><sub><b>Eve Yu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=eveyuyi" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/CooperGuo"><img src="https://avatars.githubusercontent.com/u/183056602?v=4?s=100" width="100px;" alt="CooperGuo"/><br /><sub><b>CooperGuo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=CooperGuo" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://biboyqg.github.io/"><img src="https://avatars.githubusercontent.com/u/125724218?v=4?s=100" width="100px;" alt="Banghao Chi"/><br /><sub><b>Banghao Chi</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=BiboyQG" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/varz1"><img src="https://avatars.githubusercontent.com/u/60377372?v=4?s=100" width="100px;" alt="varz1"/><br /><sub><b>varz1</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=varz1" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://google.meloguan.site"><img src="https://avatars.githubusercontent.com/u/62586556?v=4?s=100" width="100px;" alt="Melo Y Guan"/><br /><sub><b>Melo Y Guan</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Meloyg" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lmxdawn"><img src="https://avatars.githubusercontent.com/u/21293193?v=4?s=100" width="100px;" alt="lmxdawn"/><br /><sub><b>lmxdawn</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=lmxdawn" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/haikow"><img src="https://avatars.githubusercontent.com/u/22428382?v=4?s=100" width="100px;" alt="haikow"/><br /><sub><b>haikow</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=haikow" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://carlo-blog.aiju.fun/"><img src="https://avatars.githubusercontent.com/u/18513362?v=4?s=100" width="100px;" alt="Carlo"/><br /><sub><b>Carlo</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=a67793581" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/hrz394943230"><img src="https://avatars.githubusercontent.com/u/28583005?v=4?s=100" width="100px;" alt="hrz"/><br /><sub><b>hrz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=hrz394943230" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ctrlz526"><img src="https://avatars.githubusercontent.com/u/143257420?v=4?s=100" width="100px;" alt="Ctrlz"/><br /><sub><b>Ctrlz</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=ctrlz526" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/flippancy"><img src="https://avatars.githubusercontent.com/u/6467703?v=4?s=100" width="100px;" alt="flippancy"/><br /><sub><b>flippancy</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=flippancy" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Infinityay"><img src="https://avatars.githubusercontent.com/u/103165980?v=4?s=100" width="100px;" alt="Yuhang Lu"/><br /><sub><b>Yuhang Lu</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Infinityay" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://triepod.ai"><img src="https://avatars.githubusercontent.com/u/199543909?v=4?s=100" width="100px;" alt="Bryan Thompson"/><br /><sub><b>Bryan Thompson</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=triepod-ai" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://www.megvii.com"><img src="https://avatars.githubusercontent.com/u/7806992?v=4?s=100" width="100px;" alt="tan jun"/><br /><sub><b>tan jun</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=tanxxjun321" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/coldmountein"><img src="https://avatars.githubusercontent.com/u/95873096?v=4?s=100" width="100px;" alt="coldmountain"/><br /><sub><b>coldmountain</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=coldmountein" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://blog.litpp.com/"><img src="https://avatars.githubusercontent.com/u/44826388?v=4?s=100" width="100px;" alt="mamage"/><br /><sub><b>mamage</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=yqdaddy" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://runyang.vercel.app/"><img src="https://avatars.githubusercontent.com/u/54588936?v=4?s=100" width="100px;" alt="Runyang YOU"/><br /><sub><b>Runyang YOU</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=YRYangang" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.hnfnu.edu.cn/"><img src="https://avatars.githubusercontent.com/u/134906805?v=4?s=100" width="100px;" alt="e0_7"/><br /><sub><b>e0_7</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=Daily-AC" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prehisle"><img src="https://avatars.githubusercontent.com/u/2081344?v=4?s=100" width="100px;" alt="prehisle"/><br /><sub><b>prehisle</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=prehisle" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/blablabiu"><img src="https://avatars.githubusercontent.com/u/123888078?v=4?s=100" width="100px;" alt="Xinhao Chen"/><br /><sub><b>Xinhao Chen</b></sub></a><br /><a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Code">💻</a> <a href="https://github.com/xpzouying/xiaohongshu-mcp/commits?author=blablabiu" title="Documentation">📖</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-### ✨ 特别感谢
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="20%"><a href="https://github.com/wanpengxie"><img src="https://avatars.githubusercontent.com/wanpengxie" width="130px;" alt="wanpengxie"/><br /><sub><b>@wanpengxie</b></sub></a></td>
-      <td align="center" valign="top" width="20%"><a href="https://github.com/tanxxjun321"><img src="https://avatars.githubusercontent.com/u/7806992?v=4" width="130px;" alt="tanxxjun321"/><br /><sub><b>@tanxxjun321</b></sub></a></td>
-      <td align="center" valign="top" width="20%"><a href="https://github.com/Angiin"><img src="https://avatars.githubusercontent.com/u/17389304?v=4" width="130px;" alt="Angiin"/><br /><sub><b>@Angiin</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
-
-本项目遵循 [all-contributors](https://github.com/all-contributors/all-contributors) 规范。欢迎任何形式的贡献！
