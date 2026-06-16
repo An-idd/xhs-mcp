@@ -4,10 +4,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-27-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![善款已捐](https://img.shields.io/badge/善款已捐-CNY%201810.00-brightgreen?style=flat-square)](./DONATIONS.md)
-[![爱心汇聚](https://img.shields.io/badge/爱心汇聚-CNY%201524.64-blue?style=flat-square)](./DONATIONS.md)
-[![Docker Pulls](https://img.shields.io/docker/pulls/xpzouying/xiaohongshu-mcp?style=flat-square&logo=docker)](https://hub.docker.com/r/xpzouying/xiaohongshu-mcp)
-
 MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接查询小红书数据。
 
 > **本分支为「纯查询」精简版**：仅保留只读的数据查询能力（搜索、推荐列表、笔记详情+评论、用户主页），已移除发布、评论、点赞、收藏等写操作及 REST HTTP API，仅通过 MCP 协议对外提供服务。
@@ -29,32 +25,12 @@ MCP for 小红书 / xiaohongshu.com。让你的 AI 助手直接查询小红书�
 ### 📖 相关资源
 
 - **我的博客文章**：[haha.ai/xiaohongshu-mcp](https://www.haha.ai/xiaohongshu-mcp)
-- **贡献指南**：[Contributing Guide](./CONTRIBUTING.md)
 
 ### 🛠️ 疑难杂症
 
 如果您在部署传统 Docker 版本时遇到问题，**务必先查看：[各种疑难杂症 (Issues #56)](https://github.com/xpzouying/xiaohongshu-mcp/issues/56)**。
 
 > *提示：如果环境排查太耗时，切换到 [x-mcp 插件版](https://github.com/xpzouying/x-mcp) 通常是更高效的选择。*
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=xpzouying/xiaohongshu-mcp&type=Timeline)](https://www.star-history.com/#xpzouying/xiaohongshu-mcp&Timeline)
-
-## 赞赏支持
-
-本项目所有的赞赏都会用于慈善捐赠。所有的慈善捐赠记录，请参考 [DONATIONS.md](./DONATIONS.md)。
-
-**捐赠时，请备注 MCP 以及名字。**
-如需更正/撤回署名，请开 Issue 或通过邮箱联系。
-
-**支付宝（不展示二维码）：**
-
-通过支付宝向 **xpzouying@gmail.com** 赞赏。
-
-**微信：**
-
-<img src="donate/wechat@2x.png" alt="WeChat Pay QR" width="260" />
 
 ## 项目简介
 
@@ -216,56 +192,6 @@ go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 # 3. 官方
 go env -w  GOPROXY=https://goproxy.io,direct
 ```
-
-</details>
-
-**方式三：使用 Docker 容器（最简单）**
-
-<details>
-<summary>Docker 部署详情</summary>
-
-使用 Docker 部署是最简单的方式，无需安装任何开发环境。
-
-**1. 从 Docker Hub 拉取镜像（推荐）**
-
-我们提供了预构建的 Docker 镜像，可以直接从 Docker Hub 拉取使用：
-
-```bash
-# 拉取最新镜像
-docker pull xpzouying/xiaohongshu-mcp
-```
-
-Docker Hub 地址：[https://hub.docker.com/r/xpzouying/xiaohongshu-mcp](https://hub.docker.com/r/xpzouying/xiaohongshu-mcp)
-
-**2. 启动容器**
-
-```bash
-# 挂载 ./data 持久化 cookies 与运行数据，暴露 18060 端口
-docker run -d --name xiaohongshu-mcp \
-  -p 18060:18060 \
-  -v "$(pwd)/data:/app/data" \
-  xpzouying/xiaohongshu-mcp
-
-# 查看日志
-docker logs -f xiaohongshu-mcp
-```
-
-> 注：本精简分支已移除 `docker/` 目录下的 docker-compose 配置；如需 compose 编排，可自行基于上面的 `docker run` 参数编写。
-
-**3. 自己构建镜像（可选）**
-
-```bash
-# 在项目根目录运行（仓库根目录已提供 Dockerfile）
-docker build -t xpzouying/xiaohongshu-mcp .
-```
-
-**4. 配置说明**
-
-Docker 版本会自动：
-
-- 配置 CloakBrowser Chromium 和中文字体
-- 挂载 `./data` 用于存储 cookies 和运行数据目录
-- 暴露 18060 端口供 MCP 连接
 
 </details>
 
@@ -745,10 +671,8 @@ npx mcporter list xiaohongshu-mcp
 **Q:** 在设备上运行 MCP 程序出现闪退如何解决？
 **A:**
 
-1. 建议 **从源码安装**。
-2. 或使用 **Docker 安装 xiaohongshu-mcp**，教程参考：
-   - [使用 Docker 安装 xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp#:~:text=%E6%96%B9%E5%BC%8F%E4%B8%89%EF%BC%9A%E4%BD%BF%E7%94%A8%20Docker%20%E5%AE%B9%E5%99%A8%EF%BC%88%E6%9C%80%E7%AE%80%E5%8D%95%EF%BC%89)
-   - [X-MCP 项目页面](https://github.com/xpzouying/x-mcp/)
+1. 建议 **从源码安装**（`go run .`）。
+2. 或参考 [X-MCP 项目页面](https://github.com/xpzouying/x-mcp/) 的浏览器插件版。
 
 ---
 
