@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	loadDotEnv() // 读取 .env 中的 APIFY_TOKEN 等配置
+
 	var (
 		headless     bool
 		headlessMode string

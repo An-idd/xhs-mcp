@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/xpzouying/xiaohongshu-mcp/apify"
 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
 	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
 )
@@ -140,6 +142,54 @@ func (s *AppServer) handleListFeeds(ctx context.Context) *MCPToolResult {
 			Type: "text",
 			Text: string(jsonData),
 		}},
+	}
+}
+
+// handleSearchFeedsApify 通过 Apify 云端搜索小红书(不使用本地账号/cookie)
+func (s *AppServer) handleSearchFeedsApify(ctx context.Context, args SearchFeedsApifyArgs) *MCPToolResult {
+	logrus.Infof("MCP: Apify 搜索Feeds - 关键词: %s", args.Keyword)
+
+	if args.Keyword == "" {
+		return &MCPToolResult{
+			Content: []MCPContent{{Type: "text", Text: "Apify 搜索失败: 缺少关键词参数"}},
+			IsError: true,
+		}
+	}
+
+	maxResults := args.MaxResults
+	if maxResults <= 0 {
+		maxResults = 20 // 默认 20，避免按条计费产生意外费用
+	}
+
+	notes, err := apify.Search(ctx, os.Getenv("APIFY_TOKEN"), apify.SearchInput{
+		Keywords:   []string{args.Keyword},
+		MaxResults: maxResults,
+		SortType:   args.SortType,
+		NoteType:   args.NoteType,
+		TimeFilter: args.TimeFilter,
+	})
+	if err != nil {
+		return &MCPToolResult{
+			Content: []MCPContent{{Type: "text", Text: "Apify 搜索失败: " + err.Error()}},
+			IsError: true,
+		}
+	}
+
+	result := struct {
+		Keyword string       `json:"keyword"`
+		Count   int          `json:"count"`
+		Notes   []apify.Note `json:"notes"`
+	}{args.Keyword, len(notes), notes}
+	jsonData, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return &MCPToolResult{
+			Content: []MCPContent{{Type: "text", Text: fmt.Sprintf("Apify 搜索成功，但序列化失败: %v", err)}},
+			IsError: true,
+		}
+	}
+
+	return &MCPToolResult{
+		Content: []MCPContent{{Type: "text", Text: string(jsonData)}},
 	}
 }
 

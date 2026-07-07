@@ -30,6 +30,15 @@ type FilterOption struct {
 	Location    string `json:"location,omitempty" jsonschema:"位置距离: 不限|同城|附近,默认为'不限'"`
 }
 
+// SearchFeedsApifyArgs 通过 Apify 云端搜索的参数(不使用本地账号)
+type SearchFeedsApifyArgs struct {
+	Keyword    string `json:"keyword" jsonschema:"搜索关键词"`
+	MaxResults int    `json:"max_results,omitempty" jsonschema:"返回条数,默认20(按条计费,谨慎调大)"`
+	SortType   string `json:"sort_type,omitempty" jsonschema:"排序: general(综合)|popularity_descending(最热)|time_descending(最新),默认general"`
+	NoteType   string `json:"note_type,omitempty" jsonschema:"类型: all|video|image,默认all"`
+	TimeFilter string `json:"time_filter,omitempty" jsonschema:"时间范围: all|1d|1w|6mo,默认all"`
+}
+
 // FeedDetailArgs 获取Feed详情的参数
 type FeedDetailArgs struct {
 	FeedID           string `json:"feed_id" jsonschema:"小红书笔记ID，从Feed列表获取"`
@@ -176,6 +185,22 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 		},
 		withPanicRecovery("search_feeds", func(ctx context.Context, req *mcp.CallToolRequest, args SearchFeedsArgs) (*mcp.CallToolResult, any, error) {
 			result := appServer.handleSearchFeeds(ctx, args)
+			return convertToMCPResult(result), nil, nil
+		}),
+	)
+
+	// 工具 6b: Apify 云端搜索(无需登录,不使用本地账号,按条计费)
+	mcp.AddTool(server,
+		&mcp.Tool{
+			Name:        "search_feeds_apify",
+			Description: "通过 Apify 云端抓取小红书搜索结果，无需登录、不使用你的账号/cookie，规避封号风险；按条计费(约 $0.006/条)。返回结构与 search_feeds 一致，xsec_token 可直接用于 get_feed_detail。需在 .env 配置 APIFY_TOKEN。",
+			Annotations: &mcp.ToolAnnotations{
+				Title:        "Search Feeds via Apify",
+				ReadOnlyHint: true,
+			},
+		},
+		withPanicRecovery("search_feeds_apify", func(ctx context.Context, req *mcp.CallToolRequest, args SearchFeedsApifyArgs) (*mcp.CallToolResult, any, error) {
+			result := appServer.handleSearchFeedsApify(ctx, args)
 			return convertToMCPResult(result), nil, nil
 		}),
 	)
