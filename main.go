@@ -15,7 +15,7 @@ func main() {
 		binPath      string // 浏览器二进制文件路径
 		port         string
 	)
-	flag.BoolVar(&headless, "headless", true, "是否无头模式")
+	flag.BoolVar(&headless, "headless", false, "无头模式(默认有头,反检测更好;无显示器的服务器需显式 -headless=true)")
 	flag.StringVar(&headlessMode, "headless-mode", "new", "无头模式: new(新无头,反检测更好,默认)|old(旧无头)，仅 headless=true 时生效")
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
 	flag.StringVar(&port, "port", ":18060", "端口")

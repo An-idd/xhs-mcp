@@ -13,8 +13,10 @@ import (
 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
 )
 
-// defaultUserAgent 与原 headless_browser 默认 UA 保持一致。
-const defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+// defaultUserAgent 仅用于无头模式，遮蔽 UA 中的 "HeadlessChrome" 标记。
+// 有头模式不覆盖 UA：--user-agent 改不了 navigator.userAgentData(Client Hints)，
+// 强行覆盖会让 userAgent 与 userAgentData 版本对不上，反而是机器指纹。
+const defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
 
 // Browser 封装 rod 浏览器与 launcher。
 // 自建引导(替代 headless_browser 薄封装)以支持新无头模式 --headless=new，增强反检测。
@@ -59,17 +61,16 @@ func NewBrowser(headless, headlessNew bool, options ...Option) *Browser {
 		opt(cfg)
 	}
 
-	l := launcher.New().
-		Set("--no-sandbox").
-		Set("user-agent", defaultUserAgent)
+	l := launcher.New().Set("--no-sandbox")
 
 	switch {
 	case !headless:
+		// 有头模式用浏览器原生 UA(与 userAgentData 版本一致,最不易被识别),不覆盖
 		l = l.Headless(false)
 	case headlessNew:
-		l = l.HeadlessNew(true)
+		l = l.Set("user-agent", defaultUserAgent).HeadlessNew(true)
 	default:
-		l = l.Headless(true)
+		l = l.Set("user-agent", defaultUserAgent).Headless(true)
 	}
 
 	if cfg.binPath != "" {
